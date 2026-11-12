@@ -9,15 +9,14 @@
     <title>Django thingie</title>
 </head>
 <body>
-    <nav class="navbar bg-1 fg-2">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <img src="{% static 'julian.jpg' %}" width="50" alt="logo">
-                Finance app (by Julian)
+    <div class="container-fluid">
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center mb-3 md:mb-0 md:me-auto theme-inverse text-decoration-none">
+                <img src="{% static 'julian.jpg' %}" width="50" alt="logo" class="ms-2 me-3">
+                <span class="fs-xl">Finance app</span>
             </a>
 
-            <ul class="nav d-flex justify-content-end">
-                
+            <ul class="nav">
                 {% if not user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="accounts/login">Login</a>
@@ -27,14 +26,16 @@
                     <a class="nav-link" href="accounts/logout">Logout</a>
                 </li>
                 {% endif %}
-
             </ul>
-        </div>
-    </nav>
+        </header>
+    </div>
 
-    {% block content %}
+    <div class="container d-flex justify-content-center align-items-center">
 
-    {% endblock %}
+        {% block content %}
+        {% endblock %}
+
+    </div>
 
     <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
 </body>

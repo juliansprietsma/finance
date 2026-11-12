@@ -5,6 +5,6 @@ from django.http import HttpResponse
 def home(request):
     if request.user.is_authenticated:
 
-        return render(request, "finance/home.html", {"message": f"Hello {request.user}"})
+        return render(request, "finance/home.html", {"message": f"Hello {request.user.first_name}"})
     else:
         return render(request, "finance/home.html", {"message": f"Please log in"})

@@ -47,7 +47,6 @@ INSTALLED_APPS = [
 
     # custom
     'finance',
-    'users',
 ]
 
 MIDDLEWARE = [
@@ -156,3 +155,7 @@ MAILERS = {
 LOGIN_REDIRECT_URL = '/'
 
 ACCOUNT_LOGOUT_ON_GET = True
+
+ACCOUNT_LOGIN_METHODS = {'email', 'username'}
+ACCOUNT_SIGNUP_FIELDS = {'email*', 'username*', 'password1*', 'password2*'}
+ACCOUNT_SIGNUP_FORM_CLASS = "finance.forms.SignupForm"
