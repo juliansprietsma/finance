@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block tabtitle %}Create your account{% endblock %}
+
+{% block bodycontent %}
+    <div class="d-flex align-items-center justify-content-center" style="min-height: 80%; min-height: 80vh;">
+
+        <section class="card mt-3" style="max-width: 500px">
+            <div class="card-body">
+                <h3 class="card-title text-center">Create an account</h3>
+                <p class="card-subtitle text-center">Already created an account? log in <a class="link" href="{% url 'account_login' %}">here</a></p>
+
+                <form method="post" action="{% url 'account_signup' %}" class="">
+                    {% csrf_token %}
+
+                    <!-- Form errors -->
+                    {% if form.non_field_errors %}
+                        <div class="signup-errors" role="alert">
+                            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="form-field mb-3">
+                        <div class="row">
+                            <div class="col">
+                                <label for="{{ form.first_name.id }}" class="form-label">{{ form.first_name.label }}:</label>
+                                {{ form.first_name }}
+                            </div>
+                            
+                            <div class="col">
+                                <label for="{{ form.last_name.id }}" class="form-label">{{ form.last_name.label }}:</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-field mb-3">
+                        <label for="{{ form.username.id }}" class="form-label">{{ form.username.label }}:</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="form-field mb-3">
+                        <label for="{{ form.email.id }}" class="form-label">{{ form.email.label }}:</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="form-field mb-3">
+                        <div class="row">
+                            <div class="col">
+                                <label for="{{ form.password1.id }}" class="form-label">{{ form.password1.label }}:</label>
+                                {{ form.password1 }}
+                            </div>
+                            
+                            <div class="col">
+                                <label for="{{ form.password2.id }}" class="form-label">{{ form.password2.label }}:</label>
+                                {{ form.password2 }}
+                            </div>
+                        </div>
+
+                        <div class="form-text">
+                            {{ form.password1.help_text }}
+                        </div>
+                    </div>
+
+                    <div class="form-field mb-3">
+
+                    </div>
+                    
+
+
+                    {% if form.errors %}
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div class="alert theme-danger mt-3">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <div class="alert theme-danger mt-3">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <button type="submit" class="btn mt-5">Create account</button>
+
+                </form>
+
+            </div>
+        </section>
+    {% endblock %}
+</div>
