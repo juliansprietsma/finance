@@ -7,9 +7,9 @@
         <section class="card mt-3" style="max-width: 500px">
             <div class="card-body">
                 <h3 class="card-title text-center">Create an account</h3>
-                <p class="card-subtitle text-center">Already created an account? log in <a class="link" href="{% url 'account_login' %}">here</a></p>
+                <p class="card-subtitle text-center">Already created an account? log in <a class="link" href="{{ login_url }}">here</a></p>
 
-                <form method="post" action="{% url 'account_signup' %}" class="">
+                <form method="post" action="{{ account_signup }}">
                     {% csrf_token %}
 
                     <!-- Form errors -->

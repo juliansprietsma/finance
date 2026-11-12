@@ -1,5 +1,5 @@
 from django import forms
-from allauth.account.forms import SignupForm
+from allauth.account.forms import SignupForm, LoginForm
 
 class CustomSignupForm(SignupForm):
     def __init__(self, *args, **kwargs):
@@ -21,3 +21,14 @@ class CustomSignupForm(SignupForm):
         user.save()
 
         return user
+
+class CustomLoginForm(LoginForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for fieldname, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'form-control'
+            })
+
+    def login(self, request, redirect_url=None):
+        return super().login(request, redirect_url)

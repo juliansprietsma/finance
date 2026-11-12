@@ -160,5 +160,6 @@ ACCOUNT_LOGIN_METHODS = {'email', 'username'}
 ACCOUNT_SIGNUP_FIELDS = {'email*', 'username*', 'password1*', 'password2*'}
 
 ACCOUNT_FORMS = {
-    'signup': 'finance.forms.CustomSignupForm'
+    'signup': 'finance.forms.CustomSignupForm',
+    'login': 'finance.forms.CustomLoginForm'
 }
