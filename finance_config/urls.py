@@ -16,8 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from finance import views
+from finance import views as financeviews
 from allauth.account.decorators import secure_admin_login
+from allauth.account import views as accountviews
 
 admin.autodiscover()
 admin.site.login = secure_admin_login(admin.site.login)
@@ -25,6 +26,9 @@ admin.site.login = secure_admin_login(admin.site.login)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    path('', views.home, name='home'),
+    # path('accounts/login/', accountviews.LoginView.as_view(), name='account_login'),
+    # path('accounts/signup/', accountviews.SignupView.as_view(), name='account_signup'),
+    # path('accounts/logout/', accountviews.LogoutView.as_view(), name='account_logout'),
+    path('', financeviews.home, name='home'),
     path('finance/', include('finance.urls')),
 ]

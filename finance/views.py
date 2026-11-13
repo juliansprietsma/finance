@@ -1,12 +1,18 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.urls import reverse_lazy
+
+from allauth.account.views import EmailView
+
+from django.core.mail import send_mail
 
 from .models import TransactionCategory, Transaction
 
 # Create your views here.
+@login_required
 def home(request):
     if request.user.is_authenticated:
-
-        print("ID: ", request.user.id)
 
         user_categories = TransactionCategory.objects.filter(user__id=request.user.id)
 
@@ -21,6 +27,12 @@ def home(request):
     else:
         return redirect('accounts/login')
 
+@login_required
 def profile(request):
+
     return render(request, "finance/profile.html")
 
+
+class ProfileView(EmailView):
+    template_name = 'finance/profile.html'
+    success_url = reverse_lazy('profileview')

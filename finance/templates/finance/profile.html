@@ -1,1 +1,72 @@
 {% extends 'base.html' %}
+
+{% block bodycontent %}
+
+    <div class="container-fluid">
+
+        <div class="card">
+
+            <div class="card-body divide-y">
+                <h1 class="mb-5">Profile:</h1>
+
+                <div class="row py-2">
+                    <div class="container">
+                        <h2>Email:</h2>
+                        {% if new_emailaddress %}
+                        <p class="fg-emphasis-warning">Please verify your new email <p class="fg-warning">{{ new_emailaddress.email }}</p></p>
+                        {% endif %}
+
+                        {% if current_emailaddress %}
+                        <p>
+                            Your current email address is: <b>{{ current_emailaddress.email }}</b>
+                            <br>Change your email below:
+                        </p>
+                        {% endif %}
+
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <label for="{{ form.email.email.label_tag }}" class="form-label"></label>
+                            {{ form.email }}
+
+                            {% for error in form.email.errors %}
+                                <div class="alert theme-danger mt-5" role="alert">
+                                    <p>{{ error }}</p>
+                                </div>
+                            {% endfor %}
+
+                            <button type="submit" class="btn mt-5" name="action_add">Change email</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row py-2">
+                    <h2>Password:</h2>
+                </div>
+            </div>
+
+        </div>
+
+        
+
+
+        <!-- <section>
+            <form method="post">
+                {% csrf_token %}
+
+                {{ form.email.label_tag }}
+                {{ form.email }}
+
+                {% for error in form.email.errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+
+                <button type="submit" name="action_add">
+                    Change email
+                </button>
+            </form>
+        </section> -->
+
+    </div>
+
+{% endblock %}

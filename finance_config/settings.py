@@ -148,7 +148,14 @@ STATIC_URL = 'static/'
 
 MAILERS = {
     'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        'BACKEND': os.getenv('EMAIL_BACKEND'),
+        'OPTIONS': {
+            'host': os.getenv('EMAIL_HOST'),
+            'username': os.getenv('EMAIL_USER'),
+            'password': os.getenv('EMAIL_PASSWORD'),
+            'use_tls': os.getenv('EMAIL_USE_TLS'),
+            'port': os.getenv('EMAIL_PORT')
+        }
     },
 }
 
@@ -160,8 +167,12 @@ ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_LOGIN_METHODS = {'email', 'username'}
 ACCOUNT_SIGNUP_FIELDS = {'email*', 'username*', 'password1*', 'password2*'}
-
+ACCOUNT_CHANGE_EMAIL = True
+ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_FORMS = {
     'signup': 'finance.forms.CustomSignupForm',
-    'login': 'finance.forms.CustomLoginForm'
+    'login': 'finance.forms.CustomLoginForm',
+    'add_email': 'finance.forms.CustomEmailChangeForm',
 }
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_SESSION_REMEMBER = True
