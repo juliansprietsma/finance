@@ -26,9 +26,6 @@ admin.site.login = secure_admin_login(admin.site.login)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    # path('accounts/login/', accountviews.LoginView.as_view(), name='account_login'),
-    # path('accounts/signup/', accountviews.SignupView.as_view(), name='account_signup'),
-    # path('accounts/logout/', accountviews.LogoutView.as_view(), name='account_logout'),
     path('', financeviews.home, name='home'),
     path('finance/', include('finance.urls')),
 ]

@@ -173,6 +173,7 @@ ACCOUNT_FORMS = {
     'signup': 'finance.forms.CustomSignupForm',
     'login': 'finance.forms.CustomLoginForm',
     'add_email': 'finance.forms.CustomEmailChangeForm',
+    'change_password': 'finance.forms.CustomPasswordChangeForm',
 }
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_SESSION_REMEMBER = True

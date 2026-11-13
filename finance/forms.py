@@ -1,5 +1,5 @@
 from django import forms
-from allauth.account.forms import SignupForm, LoginForm, AddEmailForm
+from allauth.account.forms import SignupForm, LoginForm, AddEmailForm, ChangePasswordForm
 from allauth.account.models import EmailAddress
 from django.core.exceptions import ValidationError
 
@@ -14,7 +14,14 @@ class CustomSignupForm(SignupForm):
     first_name = forms.CharField(max_length=32, label='First Name', widget=forms.TextInput(attrs={'placeholder': 'First Name'}))
     last_name = forms.CharField(max_length=32, label='Last Name', widget=forms.TextInput(attrs={'placeholder': 'First Name'}))
 
-    
+    def clean_email(self):
+        email = super().clean_email()
+
+        if EmailAddress.objects.filter(email__iexact=email).exists():
+            raise ValidationError("This email address is already being used by another account.")
+
+        return super().clean_email()
+
     def save(self, request):
         user = super().save(request)
 
@@ -54,3 +61,15 @@ class CustomEmailChangeForm(AddEmailForm):
 
     def save(self, request):
         return super().save(request)
+
+
+class CustomPasswordChangeForm(ChangePasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for _, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'form-control'
+            })
+
+    def save(self):
+        super().save()
