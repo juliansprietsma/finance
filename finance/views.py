@@ -22,5 +22,5 @@ def home(request):
         return redirect('accounts/login')
 
 def profile(request):
-    pass
+    return render(request, "finance/profile.html")
 

@@ -36,6 +36,7 @@ class TransactionCategory(models.Model):
     def __str__(self):
         return self.category
 
+
 class Transaction(models.Model):
     TYPE_CHOICES = {
         "expense": "expense",
