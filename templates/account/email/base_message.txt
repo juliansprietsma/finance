@@ -1,0 +1,7 @@
+{% load i18n %}{% autoescape off %}{% blocktrans with site_name=current_site.name %}Hello from Finance app (by Julian)!{% endblocktrans %}
+
+{% block content %}{% endblock content %}
+
+{% blocktrans %}Thank you for using Finance app!
+xxx Julian{% endblocktrans %}
+{% endautoescape %}

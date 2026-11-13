@@ -1,5 +1,5 @@
 from django import forms
-from allauth.account.forms import SignupForm, LoginForm, AddEmailForm, ChangePasswordForm
+from allauth.account.forms import SignupForm, LoginForm, AddEmailForm, ChangePasswordForm, ResetPasswordForm
 from allauth.account.models import EmailAddress
 from django.core.exceptions import ValidationError
 
@@ -31,6 +31,21 @@ class CustomSignupForm(SignupForm):
 
         return user
 
+class CustomPasswordResetForm(ResetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for _, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'form-control'
+            })
+
+    def clean_email(self):
+        return super().clean_email()
+
+    def save(self, request):
+        return super().save(request)
+
+    
 class CustomLoginForm(LoginForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
