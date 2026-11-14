@@ -19,53 +19,72 @@
                         {% if current_emailaddress %}
                         <p>
                             Your current email address is: <b>{{ current_emailaddress.email }}</b>
-                            <br>Change your email below:
                         </p>
                         {% endif %}
+
+                        <p class="mt-5">Change your email below:</p>
 
                         <form method="post">
                             {% csrf_token %}
 
-                            <label for="{{ form.email.email.label_tag }}" class="form-label"></label>
-                            {{ form.email }}
+                            {{ email_form.email }}
 
-                            {% for error in form.email.errors %}
+                            {% for error in email_form.email.errors %}
                                 <div class="alert theme-danger mt-5" role="alert">
                                     <p>{{ error }}</p>
                                 </div>
                             {% endfor %}
 
-                            <button type="submit" class="btn mt-5" name="action_add">Change email</button>
+                            <button type="submit" class="btn mt-5" name="change_email">Change email</button>
                         </form>
                     </div>
                 </div>
 
                 <div class="row py-2">
                     <h2>Password:</h2>
+
+                    <p>Change your password:</p>
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <label for="{{ password_form.oldpassword.label }}" class="form-label mt-5">{{ password_form.oldpassword.label_tag }}</label>
+                        {{ password_form.oldpassword }}
+
+                        <label for="{{ password_form.password1.label }}" class="form-label mt-5">{{ password_form.password1.label_tag }}</label>
+                        {{ password_form.password1 }}
+
+                        {{ password_form.password1.help_text }}
+
+
+                        <label for="{{ password_form.password2.label }}" class="form-label mt-5">{{ password_form.password2.label_tag }}</label>
+                        {{ password_form.password2 }}
+
+                        {% for error in password_form.oldpassword.errors %}
+                            <div class="alert theme-danger mt-5" role="alert">
+                                <p>{{ error }}</p>
+                            </div>
+                        {% endfor %}
+
+                        {% for error in password_form.password1.errors %}
+                            <div class="alert theme-danger mt-5" role="alert">
+                                <p>{{ error }}</p>
+                            </div>
+                        {% endfor %}
+
+                        {% for error in password_form.password2.errors %}
+                            <div class="alert theme-danger mt-5" role="alert">
+                                <p>{{ error }}</p>
+                            </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn mt-5" name="change_password">Change password</button>
+                    </form>
+
+
                 </div>
             </div>
 
         </div>
-
-        
-
-
-        <!-- <section>
-            <form method="post">
-                {% csrf_token %}
-
-                {{ form.email.label_tag }}
-                {{ form.email }}
-
-                {% for error in form.email.errors %}
-                    <p class="error">{{ error }}</p>
-                {% endfor %}
-
-                <button type="submit" name="action_add">
-                    Change email
-                </button>
-            </form>
-        </section> -->
 
     </div>
 

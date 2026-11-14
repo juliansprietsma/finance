@@ -1,9 +1,9 @@
 {% extends "account/base_entrance.html" %}
 {% load i18n %}
 {% load allauth account %}
-{% block tabtitle %}
+{% block head_title %}
     {% trans "Log In" %}
-{% endblock tabtitle %}
+{% endblock head_title %}
 
 
 {% block bodycontent %}
@@ -31,6 +31,10 @@
 
                     <button type="submit" class="btn mt-5">Log in</button>
                 </form>
+
+                <div class="card-footer">
+                    <p class="text-center">Forgot your password? Reset it <a class="link" href="{% url 'account_reset_password'%}">here</a></p>
+                </div>
 
             </div>
         </section>
