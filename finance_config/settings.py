@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # third-party
+    'bootstrap_modal_forms',
+
     # allauth
     'allauth',
     'allauth.account',

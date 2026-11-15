@@ -1,8 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+from django.views.decorators.http import require_POST
 
 from allauth.account.views import EmailView, PasswordChangeView
 from allauth.account.models import EmailAddress
@@ -10,7 +13,7 @@ from allauth.account.models import EmailAddress
 from django.core.mail import send_mail
 
 from .models import TransactionCategory, Transaction
-from .forms import CustomEmailChangeForm, CustomPasswordChangeForm
+from .forms import CustomEmailChangeForm, CustomPasswordChangeForm, TransactionCategoryForm
 
 # Create your views here.
 @login_required
@@ -24,6 +27,7 @@ def home(request):
         context = {
             'categories': user_categories,
             'transactions': user_transactions,
+            'category_create_form': TransactionCategoryForm(user=request.user),
         }
 
         return render(request, "finance/home.html", context)
@@ -31,9 +35,18 @@ def home(request):
         return redirect('accounts/login')
 
 @login_required
+@require_POST
+def add_transaction_category(request):
+    form = TransactionCategoryForm(request.POST, user=request.user)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({"success": True})
+    return render(request, "finance/forms/transaction_form.html", {'category_create_form': form}, status=400)
+
+
+@login_required
 def profile(request):
     return render(request, "finance/profile.html")
-
 
 class ProfilePasswordChangeView(PasswordChangeView):
     template_name = 'finance/profile/html'
@@ -92,3 +105,4 @@ class ProfileView(LoginRequiredMixin, TemplateView):
             )
 
         return redirect("profileview")
+

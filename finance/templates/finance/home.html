@@ -4,9 +4,9 @@
 
 {% block bodycontent %}
 
-    <div class="container text-center align-items-center justify-content-center">
+    <div class="container-fluid flex-grow-1 overflow-hidden justify-content-center align-items-center">
 
-        <div class="row">
+        <div class="row h-50">
 
             <div class="col-3 d-flex align-items-center justify-content-center">
                 <h1>Placeholder</h1>
@@ -18,20 +18,36 @@
         </div>
 
 
-        <div class="row">
+        <div class="row h-50">
 
             <div class="col-3 d-flex align-items-center justify-content-center">
-                <div class="card divide-y" style="width: 350px;">
-                    <a type="button" class="theme-primary btn-solid m-4 py-3" href="admin/finance/transactioncategory/add/">+ Add category</a>
+                <div class="card divide-y" style="width: 350px; height: 350px;">
+                    <a type="button" class="theme-primary btn-solid m-4 py-3" data-bs-toggle="dialog" data-bs-target="#categoryDialog">+ Add category</a>
                     
-                    <div class="list-group overflow-auto py-3" style="max-height: 300px;">
+                    <div class="list-group overflow-auto py-3">
                         {% for category in categories %}
                             
-                            <button type="button" class="list-group-item d-flex justify-content-between align-items-center me-2 ms-2" onclick="selectItem(this)">
+                            <div class="list-group-item d-flex align-items-center">
+
+                                <a class="btn-outline theme-primary d-flex flex-grow-1 justify-content-between align-items-center" onclick="selectItem(this)">
+                                    <span>{{ category.category }}</span>
+
+                                    {% if category.budget %}
+                                        <span class="badge theme-success">€{{ category.budget }}</span>
+                                    {% endif %}
+                                </a>
+                                <button type="button" class="btn-solid btn-xs theme-primary ms-3"><i class="bi bi-pencil-fill" aria-hidden="true" style="font-size: 1em;"></i></button>
+                                <button type="button" class="btn-solid btn-xs theme-danger ms-3"><i class="bi bi-trash-fill" aria-hidden="true" style="font-size: 1em;"></i></button>
+
+                            </div>
+
+                            <!-- <button type="button" class="list-group-item d-flex justify-content-between align-items-center me-2 ms-2" onclick="selectItem(this)">
                                 <span>{{ category.category }}</span>
 
-                                <span class="badge theme-success">€{{ category.budget }}</span>
-                            </button>
+                                {% if category.budget %}
+                                    <span class="badge theme-success">€{{ category.budget }}</span>
+                                {% endif %}
+                            </button> -->
 
                         {% endfor %}
                     </div>
@@ -41,9 +57,10 @@
 
             <div class="col-9 d-flex align-items-center justify-content-center">
                 
-                <div class="table-card">
-                    <table class="table table-hover" style="max-height: 300px; width: 800px;">
-                        <thead>
+
+                <div class="table-card" style="overflow-y: auto; height: 350px;">
+                    <table class="table table-hover text-center" style="width: 1100px;">
+                        <thead style="position: sticky; top: 0; z-index: 1;">
                             <tr>
                                 <th scope="col">Description</th>
                                 <th scope="col">Amount</th>
@@ -52,36 +69,80 @@
                             </tr>
                         </thead>
                         
-                        
-                        {% for transaction in transactions %}
+                        <tbody class="table-body table-group-divider">
+                            {% for transaction in transactions %}
 
-                            <tr>
-                                <td>{{ transaction.description }}</td>
-                                <td class="rounded {% if transaction.type == 'expense' %}theme-danger{% else %}theme-success{% endif %}">€{{ transaction.amount }}</td>
-                                <td>{{ transaction.category.category }}</td>
-                                <td>{{ transaction.date }}</td>
-                            </tr>
+                                <tr>
+                                    <td>{{ transaction.description }}</td>
+                                    <td class="rounded {% if transaction.type == 'expense' %}theme-danger{% else %}theme-success{% endif %}">€{{ transaction.amount }}</td>
+                                    <td>{{ transaction.category.category }}</td>
+                                    <td>{{ transaction.date }}</td>
+                                    <td class="col-2">
+                                        <button type="button" class="btn-solid btn-xs theme-primary m-2"><i class="bi bi-pencil-fill" aria-hidden="true" style="font-size: 1em;"></i></button>
+                                        <button type="button" class="btn-solid btn-xs theme-danger m-2"><i class="bi bi-trash-fill" aria-hidden="true" style="font-size: 1em;"></i></button>
+                                    </td>
+                                </tr>
 
-                        {% endfor %}
+                            {% endfor %}
+                        </tbody>
                     </table>
                 </div>
-
+                <button class="btn-solid theme-primary ms-2">+</button>
             </div>
-
         </div>
-
     </div>
 
-    <script>
 
-        function selectItem(selectedItem) {
-            if (selectedItem.classList.contains('active')) {
-                selectedItem.classList.remove('active')
+
+
+    <dialog class="dialog" id="categoryDialog" aria-labelledby="categoryDialogTitle">
+        <div id="categoryFormContainer">
+            {% include 'finance/forms/transaction_form.html' %}
+        </div>
+    </dialog>
+
+
+
+    <script type="module">
+        import * as bootstrap from "https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js";
+
+        const container = document.getElementById('categoryFormContainer');
+        const dialog = document.getElementById('categoryDialog');
+
+        dialog.addEventListener("hidden.bs.dialog", () => {
+            window.location.reload();
+        });
+
+        container.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const form = event.target;
+
+            const response = await fetch(form.action, {
+                method: "POST",
+                body: new FormData(form),
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else if (response.status === 400) {
+                container.innerHTML = await response.text();
             } else {
-                selectedItem.classList.add('active');
+                alert("something went wrong");
+            }
+        });
+    </script>
+
+    <script>
+        function selectItem(selectedItem) {
+            if (selectedItem.classList.contains('btn-outline')) {
+                selectedItem.classList.remove('btn-outline')
+                selectedItem.classList.add('btn-solid')
+            } else {
+                selectedItem.classList.remove('btn-solid');
+                selectedItem.classList.add('btn-outline');
             }
         }
-
     </script>
 
 {% endblock bodycontent %}

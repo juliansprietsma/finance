@@ -2,6 +2,39 @@ from django import forms
 from allauth.account.forms import SignupForm, LoginForm, AddEmailForm, ChangePasswordForm, ResetPasswordForm
 from allauth.account.models import EmailAddress
 from django.core.exceptions import ValidationError
+from django.forms import ModelForm
+
+from .models import TransactionCategory
+
+
+class TransactionCategoryForm(ModelForm):
+    class Meta:
+        model = TransactionCategory
+        fields = ['category', 'budget']
+        widgets = {
+            'category': forms.TextInput(attrs={"class": "form-control"}),
+            'budget': forms.NumberInput(attrs={"class": "form-control", "min": 0}),
+        }
+
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+    def clean_category(self):
+        category = self.cleaned_data['category'].strip()
+
+        if TransactionCategory.objects.filter(user=self.user, category__iexact=category).exists():
+            raise forms.ValidationError("You already have a category with this name")
+
+        return category
+
+    def save(self, commit=True):
+        category = super().save(commit=False)
+        category.user = self.user
+        if commit:
+            category.save()
+        return category
+
 
 class CustomSignupForm(SignupForm):
     def __init__(self, *args, **kwargs):
