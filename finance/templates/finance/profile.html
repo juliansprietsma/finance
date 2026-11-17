@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block bodycontent %}
+
+    <div class="container-fluid">
+
+        <div class="card">
+
+            <div class="card-body divide-y">
+                <h1 class="mb-5">Profile:</h1>
+
+                <div class="row py-2">
+                    <div class="container">
+                        <h2>Email:</h2>
+                        {% if new_emailaddress %}
+                        <p class="fg-emphasis-warning">Please verify your new email <p class="fg-warning">{{ new_emailaddress.email }}</p></p>
+                        {% endif %}
+
+                        {% if current_emailaddress %}
+                        <p>
+                            Your current email address is: <b>{{ current_emailaddress.email }}</b>
+                        </p>
+                        {% endif %}
+
+                        <p class="mt-5">Change your email below:</p>
+
+                        <form method="post">
+                            {% csrf_token %}
+
+                            {{ email_form.email }}
+
+                            {% for error in email_form.email.errors %}
+                                <div class="alert theme-danger mt-5" role="alert">
+                                    <p>{{ error }}</p>
+                                </div>
+                            {% endfor %}
+
+                            <button type="submit" class="btn mt-5" name="change_email">Change email</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row py-2">
+                    <h2>Password:</h2>
+
+                    <p>Change your password:</p>
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <label for="{{ password_form.oldpassword.label }}" class="form-label mt-5">{{ password_form.oldpassword.label_tag }}</label>
+                        {{ password_form.oldpassword }}
+
+                        <label for="{{ password_form.password1.label }}" class="form-label mt-5">{{ password_form.password1.label_tag }}</label>
+                        {{ password_form.password1 }}
+
+                        {{ password_form.password1.help_text }}
+
+
+                        <label for="{{ password_form.password2.label }}" class="form-label mt-5">{{ password_form.password2.label_tag }}</label>
+                        {{ password_form.password2 }}
+
+                        {% for error in password_form.oldpassword.errors %}
+                            <div class="alert theme-danger mt-5" role="alert">
+                                <p>{{ error }}</p>
+                            </div>
+                        {% endfor %}
+
+                        {% for error in password_form.password1.errors %}
+                            <div class="alert theme-danger mt-5" role="alert">
+                                <p>{{ error }}</p>
+                            </div>
+                        {% endfor %}
+
+                        {% for error in password_form.password2.errors %}
+                            <div class="alert theme-danger mt-5" role="alert">
+                                <p>{{ error }}</p>
+                            </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn mt-5" name="change_password">Change password</button>
+                    </form>
+
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

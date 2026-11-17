@@ -1,0 +1,21 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+{% load allauth %}
+{% block head_title %}
+    {% trans "Verify Your Email Address" %}
+{% endblock head_title %}
+{% block bodycontent %}
+
+    <div class="container justify-content-center text-center align-middle">
+
+        <div class="alert theme-success justify-content-center align-items-center text-center" role="alert">
+            <vstack>
+                <h4 class="alert-heading mb-2">Verify your email address</h1>
+                <hr class="my-3">
+                <p>A verification email has been sent to your email address, please verify your email before continuing!</p>
+            </vstack>
+        </div>
+
+    </div>
+
+{% endblock bodycontent %}

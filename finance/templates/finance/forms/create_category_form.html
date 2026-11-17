@@ -1,0 +1,42 @@
+<form method="POST" action="{% if category_create_form.instance.pk %}{% url 'edit_category' category_create_form.instance.pk %}{% else %}{% url 'create_category' %}{% endif %}" novalidate>
+    {% csrf_token %}
+
+    <div class="dialog-header">
+        <h1 class="dialog-title" id="categoryDialogTitle">
+            {% if category_create_form.instance.pk %}
+                Edit Category
+            {% else %}
+                New category
+            {% endif %}
+        </h1>
+         <button type="button" class="btn-close" data-bs-dismiss="dialog" aria-label="Close"></button>
+    </div>
+
+    <div class="dialog-body">
+        {% if category_create_form.non_field_errors %}
+            <div class="alert alert-danger">{{ category_create_form.non_field_errors }}</div>
+        {% endif %}
+
+        {% for field in category_create_form %}
+            <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+                {% if field.help_text %}
+                    {{ field.help_text }}
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <p class="fg-danger small">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+   <div class="dialog-footer">
+        <button type="button" class="btn-solid theme-secondary" data-bs-dismiss="dialog">Cancel</button>
+        <button type="submit" class="btn-solid theme-primary">Save</button>
+   </div>
+</form>

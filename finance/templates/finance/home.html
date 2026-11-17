@@ -4,34 +4,64 @@
 
 {% block bodycontent %}
 
-    <div class="container text-center align-items-center justify-content-center">
+    <div class="container-fluid flex-grow-1 overflow-hidden justify-content-center align-items-center">
 
-        <div class="row">
+        <div class="row h-fit">
+            <div class="col-3 d-flex align-items-center justify-content-center mb-5">
+                <input class="form-control text-center" type="month" id="monthFilter">
+            </div>
+        </div>
 
-            <div class="col-3 d-flex align-items-center justify-content-center">
-                <h1>Placeholder</h1>
+        <div class="row h-fit">
+            <div class="col-3">
+
+                <div class="list-group overflow-auto mb-7">
+                    {% for cat in spent_per_category %}
+                        <div class="list-group-item">
+
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>{{ cat.category__category }}</span>
+                                <span>{{ cat.spent|floatformat:2 }} / {{ cat.budget|floatformat:2 }}</span>
+                            </div>
+
+                            <div class="progress" role="progressbar" aria-label="{{ cat.category }} budget used" aria-valuenow="{{ cat.percentage_spent }}" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar {% if cat.percentage_spent < 50 %}bg-success{% elif cat.percentage_spent > 50 and cat.percentage_spent < 100 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ cat.percentage_spent }}%;">{{ cat.percentage_spent|floatformat:2 }}%</div>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
 
+
             <div class="col-9 d-flex align-items-center justify-content-center">
-                <h1>Placeholder</h1>
+                <img class="mb-5" src="{% static 'julian.jpg' %}" style="width: 100px;">
             </div>
         </div>
 
 
-        <div class="row">
+        <div class="row h-50">
 
             <div class="col-3 d-flex align-items-center justify-content-center">
-                <div class="card divide-y" style="width: 350px;">
-                    <a type="button" class="theme-primary btn-solid m-4 py-3" href="admin/finance/transactioncategory/add/">+ Add category</a>
+                <div class="card divide-y" style="width: 100%; height: 100%;">
+                    <a type="button" class="theme-primary btn-solid m-4 py-3" data-bs-toggle="dialog" data-bs-target="#categoryDialog">+ Add category</a>
                     
-                    <div class="list-group overflow-auto py-3" style="max-height: 300px;">
+                    <div class="list-group overflow-auto py-3">
                         {% for category in categories %}
                             
-                            <button type="button" class="list-group-item d-flex justify-content-between align-items-center me-2 ms-2" onclick="selectItem(this)">
-                                <span>{{ category.category }}</span>
+                            <div class="list-group-item d-flex align-items-center">
 
-                                <span class="badge theme-success">€{{ category.budget }}</span>
-                            </button>
+                                <a class="btn-outline theme-primary d-flex flex-grow-1 justify-content-between align-items-center" onclick="selectItem(this)">
+                                    <span>{{ category.category }}</span>
+
+                                    {% if category.budget %}
+                                        <span class="badge theme-success">€{{ category.budget }}</span>
+                                    {% endif %}
+                                </a>
+                                <button type="button" class="btn-solid btn-xs theme-primary ms-3" data-edit-url="{% url 'edit_category' category.pk %}" data-edit-container="editCategoryContainer"><i class="bi bi-pencil-fill" aria-hidden="true" style="font-size: 1em;"></i></button>
+                                <button type="button" class="btn-solid btn-xs theme-danger js-open-dialog ms-3" data-bs-toggle="dialog" data-bs-target="#deleteCategoryDialog" data-delete-url="{% url 'delete_category' category.pk %}" data-action-link="#categoryDeleteButton"><i class="bi bi-trash-fill" aria-hidden="true" style="font-size: 1em;"></i></button>
+
+                            </div>
 
                         {% endfor %}
                     </div>
@@ -40,10 +70,9 @@
             </div>
 
             <div class="col-9 d-flex align-items-center justify-content-center">
-                
-                <div class="table-card">
-                    <table class="table table-hover" style="max-height: 300px; width: 800px;">
-                        <thead>
+                <div class="table-card" style="overflow-y: auto; width: 100%; height: 100%;">
+                    <table class="table table-hover text-center" style="width: 1100px;">
+                        <thead style="position: sticky; top: 0; z-index: 1;">
                             <tr>
                                 <th scope="col">Description</th>
                                 <th scope="col">Amount</th>
@@ -52,36 +81,167 @@
                             </tr>
                         </thead>
                         
-                        
-                        {% for transaction in transactions %}
+                        <tbody class="table-body table-group-divider">
+                            {% for transaction in transactions %}
 
-                            <tr>
-                                <td>{{ transaction.description }}</td>
-                                <td class="rounded {% if transaction.type == 'expense' %}theme-danger{% else %}theme-success{% endif %}">€{{ transaction.amount }}</td>
-                                <td>{{ transaction.category.category }}</td>
-                                <td>{{ transaction.date }}</td>
-                            </tr>
-
-                        {% endfor %}
+                                <tr>
+                                    <td>{{ transaction.description }}</td>
+                                    <td class="rounded {% if transaction.type == 'expense' %}theme-danger{% else %}theme-success{% endif %}">€{{ transaction.amount }}</td>
+                                    <td>{{ transaction.category.category }}</td>
+                                    <td>{{ transaction.date }}</td>
+                                    <td class="col-2">
+                                        <button type="button" class="btn-solid btn-xs theme-primary m-2" data-edit-url="{% url 'edit_transaction' transaction.pk %}" data-edit-container="editTransactionContainer"><i class="bi bi-pencil-fill" aria-hidden="true" style="font-size: 1em;"></i></button>
+                                        <button type="button" class="btn-solid btn-xs theme-danger js-open-dialog m-2" data-bs-toggle="dialog" data-bs-target="#deleteTransactionDialog" data-delete-url="{% url 'delete_transaction' transaction.pk %}" data-action-link="#transactionDeleteButton"><i class="bi bi-trash-fill" aria-hidden="true" style="font-size: 1em;"></i></button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
                     </table>
                 </div>
-
+                <button class="btn-solid theme-primary ms-2" data-bs-toggle="dialog" data-bs-target="#transactionDialog">+</button>
             </div>
-
         </div>
-
     </div>
 
-    <script>
 
-        function selectItem(selectedItem) {
-            if (selectedItem.classList.contains('active')) {
-                selectedItem.classList.remove('active')
-            } else {
-                selectedItem.classList.add('active');
-            }
+    <!-- Dialogs -->
+
+    <dialog class="dialog" id="editTransactionDialog" aria-label="Edit transaction">
+        <div id="editTransactionContainer"></div>
+    </dialog>
+    <dialog class="dialog" id="editCategoryDialog" aria-label="Edit Category">
+        <div id="editCategoryContainer"></div>
+    </dialog>
+    <dialog class="dialog" id="categoryDialog" aria-labelledby="categoryDialogTitle">
+        <div id="categoryFormContainer">
+            {% include 'finance/forms/create_category_form.html' %}
+        </div>
+    </dialog>
+
+    <dialog class="dialog" id="transactionDialog" aria-labelledby="transactionDialogTitle">
+        <div id="transactionFormContainer">
+            {% include 'finance/forms/create_transaction_form.html' %}
+        </div>
+    </dialog>
+
+    <dialog class="dialog" id="deleteTransactionDialog" aria-label="Delete Transaction">
+        <div class="dialog-header">
+            <h1 class="dialog-title">Delete Transaction</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="dialog" aria-label="Close"></button>
+        </div>
+
+        <div class="dialog-body">
+            <p>Are you sure you want to delete this transaction?</p>
+        </div>
+
+        <div class="dialog-footer">
+            <button type="button" class="btn-solid theme-secondary" data-bs-dismiss="dialog">No</button>
+            <a type="button" class="btn-solid theme-danger" id="transactionDeleteButton" href="#">Yes</a>
+        </div>
+    </dialog>
+
+    <dialog class="dialog" id="deleteCategoryDialog" aria-label="Delete Category">
+        <div class="dialog-header">
+            <h1 class="dialog-title">Delete Category</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="dialog" aria-label="Close"></button>
+        </div>
+
+        <div class="dialog-body">
+            <p>Are you sure you want to delete this category?</p>
+        </div>
+
+        <div class="dialog-footer">
+            <button type="button" class="btn-solid theme-secondary" data-bs-dismiss="dialog">No</button>
+            <a type="button" class="btn-solid theme-danger" id="categoryDeleteButton" href="#">Yes</a>
+        </div>
+    </dialog>
+
+
+    <script type="module">
+        import * as bootstrap from "https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js";
+
+        function setupFormDialog({ dialogId, containerId }) {
+            const dialog = document.getElementById(dialogId);
+            const container = document.getElementById(containerId);
+
+            dialog.addEventListener("hidden.bs.dialog", () => {
+                window.location.reload();
+            });
+
+            container.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const form = event.target;
+
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: new FormData(form),
+                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                });
+
+                if (response.ok) {
+                window.location.reload();
+                } else if (response.status === 400) {
+                    container.innerHTML = await response.text();
+                } else {
+                    alert("something went wrong");
+                }
+            });
         }
 
+        setupFormDialog({
+            dialogId: "editTransactionDialog",
+            containerId: "editTransactionContainer"
+        });
+        setupFormDialog({
+            dialogId: "categoryDialog",
+            containerId: "categoryFormContainer",
+        });
+
+        setupFormDialog({
+            dialogId: "transactionDialog",
+            containerId: "transactionFormContainer",
+        });
+        setupFormDialog({
+            dialogId: "editCategoryDialog",
+            containerId: "editCategoryContainer",
+        });
+
+        document.addEventListener("click", async (event) => {
+            const button = event.target.closest("[data-edit-url]");
+            if (!button) return;
+
+            const container = document.getElementById(button.dataset.editContainer);
+            const response = await fetch(button.dataset.editUrl);
+            if (!response.ok) {
+                alert("Could not load the form. Please try again.");
+                return;
+            }
+            container.innerHTML = await response.text();
+            bootstrap.Dialog.getOrCreateInstance(container.closest("dialog")).show();
+
+        });
+
+    </script>   
+
+    <script>
+        document.getElementById('monthFilter').valueAsDate = new Date()
+
+        document.addEventListener('click', (e) => {
+            const deleteButton = e.target.closest('.js-open-dialog');
+            if (!deleteButton) return;
+
+            document.querySelector(deleteButton.dataset.actionLink).href = deleteButton.dataset.deleteUrl;
+        });
+
+        function selectItem(selectedItem) {
+            if (selectedItem.classList.contains('btn-outline')) {
+                selectedItem.classList.remove('btn-outline')
+                selectedItem.classList.add('btn-solid')
+            } else {
+                selectedItem.classList.remove('btn-solid');
+                selectedItem.classList.add('btn-outline');
+            }
+        }
     </script>
 
 {% endblock bodycontent %}
