@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
+from django.db.models import Sum
 
 from allauth.account.views import EmailView, PasswordChangeView
 from allauth.account.models import EmailAddress
@@ -23,14 +24,23 @@ def home(request):
     if request.user.is_authenticated:
 
         user_categories = TransactionCategory.objects.filter(user__id=request.user.id)
-
         user_transactions = Transaction.objects.filter(user__id=request.user.id)
+        
+        user_expenses = Transaction.objects.filter(type='expense')
+        spent_per_category = list(user_expenses.values('category__category').annotate(spent=Sum('amount')).order_by('-spent'))
+
+        for item in spent_per_category:
+            item['budget'] = TransactionCategory.objects.filter(category=item['category__category']).values('budget').first()['budget']
+            item['percentage_spent'] = item['spent'] / item['budget'] * 100
+
+        print(item)
 
         context = {
             'categories': user_categories,
             'transactions': user_transactions,
             'category_create_form': CreateTransactionCategoryForm(user=request.user),
             'transaction_create_form': CreateTransactionForm(user=request.user),
+            'spent_per_category': spent_per_category,
         }
 
         return render(request, "finance/home.html", context)

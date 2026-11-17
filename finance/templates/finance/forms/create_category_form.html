@@ -24,6 +24,9 @@
                 </label>
 
                 {{ field }}
+                {% if field.help_text %}
+                    {{ field.help_text }}
+                {% endif %}
 
                 {% for error in field.errors %}
                     <p class="fg-danger small">{{ error }}</p>

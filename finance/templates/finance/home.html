@@ -6,14 +6,29 @@
 
     <div class="container-fluid flex-grow-1 overflow-hidden justify-content-center align-items-center">
 
-        <div class="row h-auto">
+        <div class="row h-fit">
+            <div class="col-3 d-flex align-items-center justify-content-center">
+                <input class="form-control text-center" type="month">
+            </div>
+        </div>
+
+        <div class="row h-fit">
 
             <div class="col-3 d-flex align-items-center justify-content-center">
-                <h1>Placeholder</h1>
+                
+                <div class="list-group">
+                    {% for cat in spent_per_category %}
+                    <div class="list-group-item">
+                        <label for="{{ cat.category__category }}bar">{{ cat.category__category }}</label>
+                        <progress id="{{ cat.category__category }}bar" value="{{ cat.percentage_spent }}" max="100"></progress>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
 
+
             <div class="col-9 d-flex align-items-center justify-content-center">
-                <h1>Placeholder</h1>
+                <img class="m-5" src="{% static 'julian.jpg' %}" style="width: 100px;">
             </div>
         </div>
 

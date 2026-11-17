@@ -18,7 +18,7 @@ class User(BaseModel, AbstractUser):
 
 class TransactionCategory(models.Model):
     category = models.CharField(max_length=20, blank=False)
-    budget = models.IntegerField(blank=True, null=True)
+    budget = models.IntegerField(blank=True, null=True, help_text="Your monthly budget for this category")
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
