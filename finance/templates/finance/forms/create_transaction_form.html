@@ -1,9 +1,15 @@
-<form method="POST" action="{% url 'create_transaction' %}" novalidate>
+<form method="POST" action="{% if transaction_create_form.instance.pk %}{% url 'edit_transaction' transaction_create_form.instance.pk %}{% else %}{% url 'create_transaction' %}{% endif %}" novalidate>
     {% csrf_token %}
 
     <div class="dialog-header">
-        <h1 class="dialog-title" id="transactionDialogTitle">New Transaction</h1>
-         <button type="button" class="btn-close" data-bs-dismiss="dialog" aria-label="Close"></button>
+        <h1 class="dialog-title" id="transactionDialogTitle">
+            {% if transaction_create_form.instance.pk %}
+                Edit Transaction
+            {% else %}
+                New Transaction
+            {% endif %}
+        </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="dialog" aria-label="Close"></button>
     </div>
 
     <div class="dialog-body">

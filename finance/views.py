@@ -15,6 +15,8 @@ from django.core.mail import send_mail
 from .models import TransactionCategory, Transaction
 from .forms import CustomEmailChangeForm, CustomPasswordChangeForm, CreateTransactionCategoryForm, CreateTransactionForm
 
+EDIT_TX_ID = "edit_tx_%s"
+
 # Create your views here.
 @login_required
 def home(request):
@@ -35,6 +37,20 @@ def home(request):
     else:
         return redirect('accounts/login')
 
+@login_required
+def edit_transaction(request, pk):
+    transaction = get_object_or_404(Transaction, pk=pk, user=request.user)
+
+    if request.method == "POST":
+        form = CreateTransactionForm(request.POST, user=request.user, instance=transaction, auto_id=EDIT_TX_ID)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"success": True})
+        
+        return render(request, "finance/forms/create_transaction_form.html", {"transaction_create_form": form}, status=400)
+    
+    form = CreateTransactionForm(instance=transaction, user=request.user, auto_id=EDIT_TX_ID)
+    return render(request, "finance/forms/create_transaction_form.html", {"transaction_create_form": form})
 
 @login_required
 @require_POST
@@ -45,6 +61,30 @@ def add_transaction(request):
         return JsonResponse({"success": True})
     return render(request, "finance/forms/create_transaction_form.html", {'transaction_create_form': form}, status=400)
 
+@login_required
+def delete_transaction(request, pk):
+    transaction = get_object_or_404(Transaction, pk=pk, user=request.user)
+
+    if not type(transaction) == Transaction:
+        return redirect('/')
+
+    transaction.delete()
+    return redirect('/')
+
+@login_required
+def edit_category(request, pk):
+    category = get_object_or_404(TransactionCategory, pk=pk, user=request.user)
+
+    if request.method == "POST":
+        form = CreateTransactionCategoryForm(request.POST, user=request.user, instance=category)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"success": True})
+
+        return render(request, "finance/forms/create_category_form.html", {"category_create_form": form}, status=400)
+
+    form = CreateTransactionCategoryForm(instance=category, user=request.user)
+    return render(request, "finance/forms/create_category_form.html", {"category_create_form": form})
 
 @login_required
 @require_POST
@@ -55,6 +95,15 @@ def add_transaction_category(request):
         return JsonResponse({"success": True})
     return render(request, "finance/forms/create_category_form.html", {'category_create_form': form}, status=400)
 
+@login_required
+def delete_transaction_category(request, pk):
+    category = get_object_or_404(TransactionCategory, pk=pk, user=request.user)
+
+    if not isinstance(category, TransactionCategory):
+        return redirect('/')
+
+    category.delete()
+    return redirect('/')
 
 @login_required
 def profile(request):
@@ -117,4 +166,3 @@ class ProfileView(LoginRequiredMixin, TemplateView):
             )
 
         return redirect("profileview")
-

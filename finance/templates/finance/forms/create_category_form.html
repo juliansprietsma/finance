@@ -1,8 +1,14 @@
-<form method="POST" action="{% url 'create_category' %}" novalidate>
+<form method="POST" action="{% if category_create_form.instance.pk %}{% url 'edit_category' category_create_form.instance.pk %}{% else %}{% url 'create_category' %}{% endif %}" novalidate>
     {% csrf_token %}
 
     <div class="dialog-header">
-        <h1 class="dialog-title" id="categoryDialogTitle">New Category</h1>
+        <h1 class="dialog-title" id="categoryDialogTitle">
+            {% if category_create_form.instance.pk %}
+                Edit Category
+            {% else %}
+                New category
+            {% endif %}
+        </h1>
          <button type="button" class="btn-close" data-bs-dismiss="dialog" aria-label="Close"></button>
     </div>
 

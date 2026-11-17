@@ -50,10 +50,21 @@ class CreateTransactionCategoryForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.user = user
 
+    def clean_budget(self):
+        budget = self.cleaned_data['budget']
+        if budget:
+            if budget < 0:
+                raise forms.ValidationError("Budget must not be negative")
+        return budget
+
     def clean_category(self):
         category = self.cleaned_data['category'].strip()
+        userCategories = TransactionCategory.objects.filter(user=self.user, category__iexact=category)
 
-        if TransactionCategory.objects.filter(user=self.user, category__iexact=category).exists():
+        if self.instance.pk:
+            userCategories = userCategories.exclude(pk=self.instance.pk)
+
+        if userCategories.exists():
             raise forms.ValidationError("You already have a category with this name")
 
         return category

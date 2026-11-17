@@ -43,11 +43,12 @@ class Transaction(models.Model):
         "income": "income"
     }
     
-    description = models.CharField(blank=False)
+    description = models.CharField(max_length=255, blank=False)
     category = models.ForeignKey(
         TransactionCategory,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='transaction',
+        null=True
     )
     type = models.CharField(choices=TYPE_CHOICES, default=TYPE_CHOICES['expense'], blank=False)
     amount = models.DecimalField(max_digits=10, decimal_places=2, blank=False)
