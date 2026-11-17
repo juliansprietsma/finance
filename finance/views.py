@@ -26,14 +26,13 @@ def home(request):
         user_categories = TransactionCategory.objects.filter(user__id=request.user.id)
         user_transactions = Transaction.objects.filter(user__id=request.user.id)
         
-        user_expenses = Transaction.objects.filter(type='expense')
+        user_expenses = Transaction.objects.filter(type='expense', user=request.user, category__budget__gt=0)
         spent_per_category = list(user_expenses.values('category__category').annotate(spent=Sum('amount')).order_by('-spent'))
 
         for item in spent_per_category:
             item['budget'] = TransactionCategory.objects.filter(category=item['category__category']).values('budget').first()['budget']
             item['percentage_spent'] = item['spent'] / item['budget'] * 100
 
-        print(item)
 
         context = {
             'categories': user_categories,
