@@ -4,10 +4,40 @@ from allauth.account.models import EmailAddress
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 
-from .models import TransactionCategory
+from .models import TransactionCategory, Transaction
 
 
-class TransactionCategoryForm(ModelForm):
+class CreateTransactionForm(ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ['description', 'category', 'type', 'amount', 'date']
+        widgets = {
+            'description': forms.TextInput(attrs={"class": "form-control"}),
+            'category': forms.Select(attrs={"class": "form-control"}),
+            'type': forms.Select(attrs={"class": "form-control"}),
+            'amount': forms.NumberInput(attrs={"class": "form-control", "step": "0.01", "min": "0.01"}),
+            'date': forms.DateInput(attrs={"class": "form-control", "type": "date"})
+        }
+
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.fields['category'].queryset = TransactionCategory.objects.filter(user=user)
+
+    def clean_amount(self):
+        amount = self.cleaned_data['amount']
+        if amount <= 0:
+            raise forms.ValidationError("Amount must be greater than 0")
+        return amount
+
+    def save(self, commit=True):
+        transaction = super().save(commit=False)
+        transaction.user = self.user
+        if commit:
+            transaction.save()
+        return transaction
+
+class CreateTransactionCategoryForm(ModelForm):
     class Meta:
         model = TransactionCategory
         fields = ['category', 'budget']

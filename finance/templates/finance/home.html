@@ -87,7 +87,7 @@
                         </tbody>
                     </table>
                 </div>
-                <button class="btn-solid theme-primary ms-2">+</button>
+                <button class="btn-solid theme-primary ms-2" data-bs-toggle="dialog" data-bs-target="#transactionDialog">+</button>
             </div>
         </div>
     </div>
@@ -97,39 +97,58 @@
 
     <dialog class="dialog" id="categoryDialog" aria-labelledby="categoryDialogTitle">
         <div id="categoryFormContainer">
-            {% include 'finance/forms/transaction_form.html' %}
+            {% include 'finance/forms/create_category_form.html' %}
+        </div>
+    </dialog>
+
+    <dialog class="dialog" id="transactionDialog" aria-labelledby="transactionDialogTitle">
+        <div id="transactionFormContainer">
+            {% include 'finance/forms/create_transaction_form.html' %}
         </div>
     </dialog>
 
 
 
+    <!-- categoryDialog -->
     <script type="module">
         import * as bootstrap from "https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js";
 
-        const container = document.getElementById('categoryFormContainer');
-        const dialog = document.getElementById('categoryDialog');
+        function setupFormDialog({ dialogId, containerId}) {
+            const dialog = document.getElementById(dialogId);
+            const container = document.getElementById(containerId);
 
-        dialog.addEventListener("hidden.bs.dialog", () => {
-            window.location.reload();
-        });
-
-        container.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const form = event.target;
-
-            const response = await fetch(form.action, {
-                method: "POST",
-                body: new FormData(form),
-                headers: { "X-Requested-With": "XMLHttpRequest" },
+            dialog.addEventListener("hidden.bs.dialog", () => {
+                window.location.reload();
             });
 
-            if (response.ok) {
+            container.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const form = event.target;
+
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: new FormData(form),
+                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                });
+
+                if (response.ok) {
                 window.location.reload();
-            } else if (response.status === 400) {
-                container.innerHTML = await response.text();
-            } else {
-                alert("something went wrong");
-            }
+                } else if (response.status === 400) {
+                    container.innerHTML = await response.text();
+                } else {
+                    alert("something went wrong");
+                }
+            });
+        }
+
+        setupFormDialog({
+            dialogId: "categoryDialog",
+            containerId: "categoryFormContainer",
+        });
+
+        setupFormDialog({
+            dialogId: "transactionDialog",
+            containerId: "transactionFormContainer",
         });
     </script>
 

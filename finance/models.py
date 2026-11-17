@@ -43,7 +43,7 @@ class Transaction(models.Model):
         "income": "income"
     }
     
-    description = models.TextField(blank=False)
+    description = models.CharField(blank=False)
     category = models.ForeignKey(
         TransactionCategory,
         on_delete=models.CASCADE,

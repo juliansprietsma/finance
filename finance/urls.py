@@ -7,4 +7,5 @@ urlpatterns = [
     path('profile/password_change', views.ProfilePasswordChangeView.as_view(), name='passwordchangeview'),
     path('profile/email_change', views.ProfileEmailChangeView.as_view(), name='emailchangeview'),
     path('category/add/', views.add_transaction_category, name='create_category'),
+    path('transaction/add/', views.add_transaction, name='create_transaction'),
 ]

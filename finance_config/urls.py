@@ -18,14 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from finance import views as financeviews
 from allauth.account.decorators import secure_admin_login
-from allauth.account import views as accountviews
 
 admin.autodiscover()
 admin.site.login = secure_admin_login(admin.site.login)
 
 urlpatterns = [
+    path('', financeviews.home, name='home'),
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    path('', financeviews.home, name='home'),
     path('finance/', include('finance.urls')),
 ]

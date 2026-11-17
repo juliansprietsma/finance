@@ -13,7 +13,7 @@ from allauth.account.models import EmailAddress
 from django.core.mail import send_mail
 
 from .models import TransactionCategory, Transaction
-from .forms import CustomEmailChangeForm, CustomPasswordChangeForm, TransactionCategoryForm
+from .forms import CustomEmailChangeForm, CustomPasswordChangeForm, CreateTransactionCategoryForm, CreateTransactionForm
 
 # Create your views here.
 @login_required
@@ -27,21 +27,33 @@ def home(request):
         context = {
             'categories': user_categories,
             'transactions': user_transactions,
-            'category_create_form': TransactionCategoryForm(user=request.user),
+            'category_create_form': CreateTransactionCategoryForm(user=request.user),
+            'transaction_create_form': CreateTransactionForm(user=request.user),
         }
 
         return render(request, "finance/home.html", context)
     else:
         return redirect('accounts/login')
 
+
 @login_required
 @require_POST
-def add_transaction_category(request):
-    form = TransactionCategoryForm(request.POST, user=request.user)
+def add_transaction(request):
+    form = CreateTransactionForm(request.POST, user=request.user)
     if form.is_valid():
         form.save()
         return JsonResponse({"success": True})
-    return render(request, "finance/forms/transaction_form.html", {'category_create_form': form}, status=400)
+    return render(request, "finance/forms/create_transaction_form.html", {'transaction_create_form': form}, status=400)
+
+
+@login_required
+@require_POST
+def add_transaction_category(request):
+    form = CreateTransactionCategoryForm(request.POST, user=request.user)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({"success": True})
+    return render(request, "finance/forms/create_category_form.html", {'category_create_form': form}, status=400)
 
 
 @login_required
