@@ -23,7 +23,7 @@ admin.autodiscover()
 admin.site.login = secure_admin_login(admin.site.login)
 
 urlpatterns = [
-    path('', financeviews.home, name='home'),
+    path('', financeviews.home),
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('finance/', include('finance.urls')),

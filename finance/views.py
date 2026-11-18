@@ -8,6 +8,8 @@ from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 from django.db.models import Sum
 
+import datetime
+
 from allauth.account.views import EmailView, PasswordChangeView
 from allauth.account.models import EmailAddress
 
@@ -20,13 +22,22 @@ EDIT_TX_ID = "edit_tx_%s"
 
 # Create your views here.
 @login_required
-def home(request):
+def home(request, year: int = datetime.datetime.now().year, month: int = datetime.datetime.now().month):
     if request.user.is_authenticated:
 
+        if (month and year) and (month >= 1 and month <= 12) and (year >= 0 and year <= datetime.datetime.now().year):
+            year = year
+            month = month
+        else:
+            year=datetime.datetime.now().year
+            month=datetime.datetime.now().month
+
+
+        month_filter = datetime.date(year=year, month=month, day=1)
         user_categories = TransactionCategory.objects.filter(user__id=request.user.id)
-        user_transactions = Transaction.objects.filter(user__id=request.user.id)
+        user_transactions = Transaction.objects.filter(user__id=request.user.id, date__year=month_filter.year, date__month=month_filter.month)
         
-        user_expenses = Transaction.objects.filter(type='expense', user=request.user, category__budget__gt=0)
+        user_expenses = user_transactions.filter(type='expense', user=request.user, category__budget__gt=0)
         spent_per_category = list(user_expenses.values('category__category').annotate(spent=Sum('amount')).order_by('-spent'))
 
         for item in spent_per_category:
@@ -40,6 +51,8 @@ def home(request):
             'category_create_form': CreateTransactionCategoryForm(user=request.user),
             'transaction_create_form': CreateTransactionForm(user=request.user),
             'spent_per_category': spent_per_category,
+            'year': year,
+            'month': month,
         }
 
         return render(request, "finance/home.html", context)

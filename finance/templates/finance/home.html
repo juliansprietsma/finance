@@ -224,7 +224,22 @@
     </script>   
 
     <script>
-        document.getElementById('monthFilter').valueAsDate = new Date()
+        monthFilter = document.getElementById('monthFilter');
+        monthFilter.value = "{{ year }}-{{ month }}";
+
+        date = new Date(monthFilter.value);
+        const year = date.getYear();
+        const month = date.getMonth();
+
+
+
+        const url = "{% url 'homeView' year=0 month=0 %}";
+
+        const finalurl = url.replace(/0\/0$/, `${year}/${month}`);
+
+        monthFilter.onchange = function() {
+            window.location.href = month;
+        }
 
         document.addEventListener('click', (e) => {
             const deleteButton = e.target.closest('.js-open-dialog');
