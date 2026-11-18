@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 from django.db.models import Sum
+from django.db.models.functions import Lower
 
 import datetime
 
@@ -22,21 +23,26 @@ EDIT_TX_ID = "edit_tx_%s"
 
 # Create your views here.
 @login_required
-def home(request, year: int = datetime.datetime.now().year, month: int = datetime.datetime.now().month):
+def home(request, year: int | None = None, month: int | None = None):
     if request.user.is_authenticated:
 
-        if (month and year) and (month >= 1 and month <= 12) and (year >= 0 and year <= datetime.datetime.now().year):
+        if (month and year) and (month >= 1 and month <= 12) and (year >= 0 and year <= datetime.datetime.now().year + 5):
             year = year
             month = month
         else:
             year=datetime.datetime.now().year
             month=datetime.datetime.now().month
 
+        selected_categories = [c.lower() for c in request.GET.getlist("category")]
+
+        print(selected_categories)
 
         month_filter = datetime.date(year=year, month=month, day=1)
         user_categories = TransactionCategory.objects.filter(user__id=request.user.id)
         user_transactions = Transaction.objects.filter(user__id=request.user.id, date__year=month_filter.year, date__month=month_filter.month)
-        
+        if selected_categories:
+            user_transactions = user_transactions.annotate(category_lower=Lower("category__category")).filter(category_lower__in=selected_categories)
+
         user_expenses = user_transactions.filter(type='expense', user=request.user, category__budget__gt=0)
         spent_per_category = list(user_expenses.values('category__category').annotate(spent=Sum('amount')).order_by('-spent'))
 
@@ -44,9 +50,12 @@ def home(request, year: int = datetime.datetime.now().year, month: int = datetim
             item['budget'] = TransactionCategory.objects.filter(category=item['category__category']).values('budget').first()['budget']
             item['percentage_spent'] = item['spent'] / item['budget'] * 100
 
+        category_filter = list(user_categories)
+        for cat in category_filter:
+            cat.active = cat.category.lower() in selected_categories
 
         context = {
-            'categories': user_categories,
+            'categories': category_filter,
             'transactions': user_transactions,
             'category_create_form': CreateTransactionCategoryForm(user=request.user),
             'transaction_create_form': CreateTransactionForm(user=request.user),
